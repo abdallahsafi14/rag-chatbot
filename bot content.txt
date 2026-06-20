@@ -1,0 +1,390 @@
+chatbot.py
+# # from langchain_huggingface import HuggingFaceEmbeddings
+# # from langchain_chroma import Chroma
+# # from langchain_groq import ChatGroq
+# # import gradio as gr
+# # from dotenv import load_dotenv
+# # load_dotenv()
+# # from langchain_openai import ChatOpenAI
+# # import os
+
+# # CHROMA_PATH = r"chroma_db"
+
+# # # نموذج embeddings متعدد اللغات يدعم العربية
+# # # embeddings_model = HuggingFaceEmbeddings(
+# # #     model_name="paraphrase-multilingual-MiniLM-L12-v2"
+# # # )
+
+# # embeddings_model = HuggingFaceEmbeddings(
+# #     model_name="intfloat/multilingual-e5-small"
+# # )
+
+# # # llm = ChatGroq(temperature=0.5, model="llama-3.1-8b-instant")
+
+
+# # llm = ChatOpenAI(
+# #     model="gpt-4o-mini",
+# #     temperature=0.5,
+# #     base_url="https://models.inference.ai.azure.com",
+# #     api_key=os.getenv("GITHUB_TOKEN"),
+# # )
+
+# # vector_store = Chroma(
+# #     collection_name="example_collection",
+# #     embedding_function=embeddings_model,
+# #     persist_directory=CHROMA_PATH,
+# # )
+
+# # num_results = 5
+# # retriever = vector_store.as_retriever(search_kwargs={'k': num_results})
+
+# # def stream_response(message, history):
+# #     docs = retriever.invoke(message)
+
+# #     knowledge = ""
+# #     for doc in docs:
+# #         knowledge += doc.page_content + "\n\n"
+
+# #     if message is not None:
+# #         partial_message = ""
+
+# #         rag_prompt = f"""
+# #         أنت مساعد ذكي تجيب على الأسئلة بناءً على المعلومات المقدمة لك فقط.
+# #         - أجب دائماً باللغة العربية الفصحى السليمة.
+# #         - لا تستخدم معلوماتك الداخلية، بل اعتمد فقط على قسم "المعلومات المتاحة".
+# #         - لا تذكر للمستخدم أي شيء عن المصدر أو المعلومات المقدمة.
+# #         - إذا لم تجد إجابة في المعلومات المتاحة، قل: "لا تتوفر لديّ معلومات كافية حول هذا الموضوع."
+# #         - اجعل إجاباتك واضحة ومنظمة.
+
+# #         السؤال: {message}
+
+# #         سجل المحادثة: {history}
+
+# #         المعلومات المتاحة:
+# #         {knowledge}
+# #         """
+
+# #         for response in llm.stream(rag_prompt):
+# #             partial_message += response.content
+# #             yield partial_message
+
+# # # واجهة Gradio مع دعم RTL للعربية
+# # # chatbot = gr.ChatInterface(
+# # #     stream_response,
+# # #     title="المساعد الذكي",
+# # #     description="اسألني أي سؤال وسأجيبك بناءً على المعلومات المتاحة",
+# # #     textbox=gr.Textbox(
+# # #         placeholder="اكتب سؤالك هنا...",
+# # #         container=False,
+# # #         autoscroll=True,
+# # #         scale=7,
+# # #         rtl=True,
+# # #     ),
+# # #     css="""
+# # #         .message-wrap { direction: rtl; text-align: right; }
+# # #         .user { direction: rtl; text-align: right; }
+# # #         .bot { direction: rtl; text-align: right; }
+# # #     """,
+# # # )
+
+# # # chatbot.launch()
+
+# # # initiate the Gradio app
+# # chatbot = gr.ChatInterface(
+# #     stream_response,
+# #     title="المساعد الذكي",
+# #     description="اسألني أي سؤال وسأجيبك بناءً على المعلومات المتاحة",
+# #     textbox=gr.Textbox(
+# #         placeholder="اكتب سؤالك هنا...",
+# #         container=False,
+# #         autoscroll=True,
+# #         scale=7,
+# #         rtl=True,
+# #     ),
+# # )
+
+# # chatbot.launch()
+
+# from langchain_huggingface import HuggingFaceEmbeddings
+# from langchain_chroma import Chroma
+# from langchain_groq import ChatGroq
+# import gradio as gr
+# from dotenv import load_dotenv
+# load_dotenv()
+
+# CHROMA_PATH = r"chroma_db"
+
+# # نموذج embeddings خفيف يدعم العربية
+# embeddings_model = HuggingFaceEmbeddings(
+#     model_name="intfloat/multilingual-e5-small"
+# )
+
+# # Groq مع نموذج خفيف يدعم العربية جيداً
+# # llm = ChatGroq(temperature=0.5, model="llama-3.1-8b-instant")
+# llm = ChatGroq(temperature=0.3, model="llama-3.3-70b-versatile")
+
+# vector_store = Chroma(
+#     collection_name="example_collection",
+#     embedding_function=embeddings_model,
+#     persist_directory=CHROMA_PATH,
+# )
+
+# retriever = vector_store.as_retriever(search_kwargs={'k': 5})
+
+# def stream_response(message, history):
+#     # multilingual-e5-small يحتاج هذا الـ prefix
+#     docs = retriever.invoke("query: " + message)
+# # def stream_response(message, history):
+#     # docs = retriever.invoke(message)
+
+#     knowledge = ""
+#     for doc in docs:
+#         knowledge += doc.page_content + "\n\n"
+
+#     if message is not None:
+#         partial_message = ""
+
+#         rag_prompt = rag_prompt = rag_prompt = f"""
+#         أنت مساعد ذكي متخصص تجيب على أسئلة المستخدمين بناءً على محتوى وثيقة رسمية.
+        
+#         **قواعد الإجابة:**
+#         - أجب باللغة العربية الفصحى بأسلوب واضح ومنظم.
+#         - اعتمد حصراً على المعلومات المتاحة أدناه ولا تضف معلومات من عندك.
+#         - إذا كان السؤال تحية أو خارج نطاق الوثيقة، رد بإيجاز ووجّه المستخدم لطرح سؤال متعلق بالوثيقة.
+#         - إذا لم تجد الإجابة في المعلومات المتاحة قل: "لا تتوفر لديّ معلومات كافية حول هذا الموضوع في الوثيقة."
+#         - نظّم إجابتك بنقاط أو فقرات عند الحاجة.
+#         - لا تذكر أنك تعتمد على وثيقة أو مصدر معين.
+
+#         السؤال: {message}
+
+#         سجل المحادثة: {history}
+
+#         المعلومات المتاحة:
+#         {knowledge}
+#         """
+
+#         for response in llm.stream(rag_prompt):
+#             partial_message += response.content
+#             yield partial_message
+
+# chatbot = gr.ChatInterface(
+#     stream_response,
+#     title="المساعد الذكي",
+#     description="اسألني أي سؤال وسأجيبك بناءً على المعلومات المتاحة",
+#     textbox=gr.Textbox(
+#         placeholder="اكتب سؤالك هنا...",
+#         container=False,
+#         autoscroll=True,
+#         scale=7,
+#         rtl=True,
+#     ),
+# )
+
+# chatbot.launch()
+
+
+
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
+from langchain_groq import ChatGroq
+import gradio as gr
+from dotenv import load_dotenv
+load_dotenv()
+
+CHROMA_PATH = r"chroma_db"
+
+# نموذج embeddings محسّن للعربية (نفس النموذج المستخدم في ingest)
+embeddings_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+)
+
+llm = ChatGroq(temperature=0.4, model="llama-3.3-70b-versatile", max_tokens=1024)
+
+vector_store = Chroma(
+    collection_name="example_collection",
+    embedding_function=embeddings_model,
+    persist_directory=CHROMA_PATH,
+)
+
+retriever = vector_store.as_retriever(search_kwargs={'k': 4})
+
+
+def stream_response(message, history):
+    # هذا النموذج لا يحتاج إلى prefix "query: "
+    docs = retriever.invoke(message)
+
+    print(f"DEBUG: عدد المقاطع المسترجعة = {len(docs)}")
+    for d in docs:
+        print("---", d.page_content[:100])
+
+    knowledge = ""
+    for doc in docs:
+        knowledge += doc.page_content[:600] + "\n\n"
+
+    if message is not None:
+        partial_message = ""
+ 
+        rag_prompt = f"""
+        أنت مساعد ذكي متخصص تجيب على أسئلة المستخدمين بناءً على محتوى وثيقة رسمية.
+
+        **قواعد الإجابة:**
+        - أجب باللغة العربية الفصحى بأسلوب واضح ومنظم.
+        - اعتمد حصراً على المعلومات المتاحة أدناه ولا تضف معلومات من عندك.
+        - إذا كان السؤال تحية أو خارج نطاق الوثيقة، رد بإيجاز ووجّه المستخدم لطرح سؤال متعلق بالوثيقة.
+        - إذا لم تجد الإجابة في المعلومات المتاحة قل: "لا تتوفر لديّ معلومات كافية حول هذا الموضوع في الوثيقة."
+        - نظّم إجابتك بنقاط أو فقرات عند الحاجة.
+        - لا تذكر أنك تعتمد على وثيقة أو مصدر معين.
+
+        السؤال: {message}
+
+        سجل المحادثة: {history}
+
+        المعلومات المتاحة:
+        {knowledge}
+        """
+
+        for response in llm.stream(rag_prompt):
+            partial_message += response.content
+            yield partial_message
+
+
+chatbot = gr.ChatInterface(
+    stream_response,
+    title="المساعد الذكي",
+    description="اسألني أي سؤال وسأجيبك بناءً على المعلومات المتاحة",
+    textbox=gr.Textbox(
+        placeholder="اكتب سؤالك هنا...",
+        container=False,
+        autoscroll=True,
+        scale=7,
+        rtl=True,
+    ),
+)
+
+chatbot.launch()
+---FILE_SEPARATOR---
+ingest_database.py
+# from langchain_community.document_loaders import PyPDFDirectoryLoader
+# from langchain_text_splitters import RecursiveCharacterTextSplitter
+# # from langchain_openai.embeddings import OpenAIEmbeddings
+# from langchain_huggingface import HuggingFaceEmbeddings
+# from langchain_chroma import Chroma
+# from uuid import uuid4
+
+# # import the .env file
+# from dotenv import load_dotenv
+# load_dotenv()
+
+# # configuration
+# DATA_PATH = r"data"
+# CHROMA_PATH = r"chroma_db"
+
+# # initiate the embeddings model
+# # embeddings_model = OpenAIEmbeddings(model="text-embedding-3-large")
+# # embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+# # embeddings_model = HuggingFaceEmbeddings(model_name="paraphrase-multilingual-MiniLM-L12-v2")
+
+# embeddings_model = HuggingFaceEmbeddings(
+#     model_name="intfloat/multilingual-e5-small"
+# )
+
+# # initiate the vector store
+# vector_store = Chroma(
+#     collection_name="example_collection",
+#     embedding_function=embeddings_model,
+#     persist_directory=CHROMA_PATH,
+# )
+
+# # loading the PDF document
+# loader = PyPDFDirectoryLoader(DATA_PATH)
+
+# raw_documents = loader.load()
+
+# # splitting the document
+# text_splitter = RecursiveCharacterTextSplitter(
+#     chunk_size=300,
+#     chunk_overlap=100,
+#     length_function=len,
+#     is_separator_regex=False,
+# )
+
+# # creating the chunks
+# chunks = text_splitter.split_documents(raw_documents)
+
+# # creating unique ID's
+# uuids = [str(uuid4()) for _ in range(len(chunks))]
+
+# # adding chunks to vector store
+# vector_store.add_documents(documents=chunks, ids=uuids)
+
+
+
+import os
+import fitz  # PyMuPDF
+from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
+from uuid import uuid4
+
+from dotenv import load_dotenv
+load_dotenv()
+
+# configuration
+DATA_PATH = r"data"
+CHROMA_PATH = r"chroma_db"
+
+# نموذج embeddings محسّن للعربية
+embeddings_model = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+)
+
+# initiate the vector store
+vector_store = Chroma(
+    collection_name="example_collection",
+    embedding_function=embeddings_model,
+    persist_directory=CHROMA_PATH,
+)
+
+
+def load_pdfs_with_pymupdf(data_path):
+    """استخراج نص PDF باستخدام PyMuPDF (يعالج RTL العربي بشكل صحيح)"""
+    docs = []
+    for fname in os.listdir(data_path):
+        if fname.lower().endswith(".pdf"):
+            path = os.path.join(data_path, fname)
+            pdf = fitz.open(path)
+            for i, page in enumerate(pdf):
+                text = page.get_text("text")
+                docs.append(
+                    Document(
+                        page_content=text,
+                        metadata={"source": fname, "page": i + 1},
+                    )
+                )
+            pdf.close()
+    return docs
+
+
+raw_documents = load_pdfs_with_pymupdf(DATA_PATH)
+
+# splitting the document
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=800,
+    chunk_overlap=150,
+    length_function=len,
+    is_separator_regex=False,
+    separators=["\n\n", "\n", "؟", "!", ".", " ", ""],
+)
+
+# creating the chunks
+chunks = text_splitter.split_documents(raw_documents)
+
+# creating unique ID's
+uuids = [str(uuid4()) for _ in range(len(chunks))]
+
+# adding chunks to vector store
+vector_store.add_documents(documents=chunks, ids=uuids)
+
+print(f"تم إضافة {len(chunks)} مقطع إلى قاعدة البيانات.")
+---FILE_SEPARATOR---
