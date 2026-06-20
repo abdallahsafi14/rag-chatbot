@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 from langchain_chroma import Chroma
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
@@ -17,11 +17,12 @@ HOST        = "0.0.0.0"
 PORT        = int(os.environ.get("PORT", 8000))
 
 # ─── تحميل نموذج الـ Embeddings ──────────────────────────────────────────────
-print("[STARTUP] ⏳ جاري تحميل نموذج الـ Embeddings...")
-embeddings_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+print("[STARTUP] ⏳ جاري تهيئة نموذج الـ Embeddings عبر HuggingFace API...")
+embeddings_model = HuggingFaceInferenceAPIEmbeddings(
+    api_key=os.environ.get("HF_TOKEN"),
+    model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
 )
-print("[STARTUP] ✅ تم تحميل نموذج الـ Embeddings بنجاح")
+print("[STARTUP] ✅ تم تهيئة نموذج الـ Embeddings بنجاح")
 
 # ─── تهيئة Groq LLM ──────────────────────────────────────────────────────────
 print("[STARTUP] ⏳ جاري تهيئة Groq LLM...")
