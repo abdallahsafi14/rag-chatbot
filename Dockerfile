@@ -17,6 +17,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Pre-download the embedding model so cold starts don't hit HF rate limits
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')"
+
 EXPOSE 8000
 
 CMD ["sh", "-c", "uvicorn chatbot:app --host 0.0.0.0 --port ${PORT:-8000}"]
